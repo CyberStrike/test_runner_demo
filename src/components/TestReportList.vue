@@ -23,7 +23,7 @@ export default {
   },
   methods: {
     statusToText(status) {
-      return ["idle", "running", "failed", "passed"][status];
+      return ["idle", "running", "passed", "failed"][status];
     },
   },
 };

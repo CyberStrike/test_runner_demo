@@ -10,20 +10,27 @@
 <script>
 import TestReportList from "@/components/TestReportList";
 
-// const IDLE = 0;
+const IDLE = 0;
 const RUNNING = 1;
 const PASSED = 2;
 const FAILED = 3;
+
+const testStatus = {
+  IDLE: 0,
+  RUNNING: 1,
+  PASSED: 2,
+  FAILED: 3,
+};
 
 export default {
   name: "TestRunnerPage",
   components: { TestReportList },
   data: () => ({
     tests: [
-      { status: null, id: 1, name: "Test" },
-      { status: null, id: 2, name: "Test A Thing" },
-      { status: null, id: 3, name: "Test Another Thing" },
-      { status: null, id: 4, name: "Test One More Thing" },
+      { status: IDLE, id: 1, name: "Test" },
+      { status: IDLE, id: 2, name: "Test A Thing" },
+      { status: IDLE, id: 3, name: "Test Another Thing" },
+      { status: IDLE, id: 4, name: "Test One More Thing" },
     ],
   }),
   computed: {
@@ -38,26 +45,22 @@ export default {
     updateTestStatus(status, test) {
       test.status = status;
       const testIndex = this.tests.findIndex((t) => test.id === t.id);
+      console.debug(test.id, Object.keys(testStatus)[test.status]);
       this.tests.splice(testIndex, 1, test);
-    },
-    testCase(update) {
-      return [Promise.resolve(update(PASSED)), Promise.resolve(update(FAILED))][
-        this.randomInt(0, 1)
-      ];
+      return test;
     },
     runTest(test) {
       const MINIMUM_TIME = 1000;
       const MAXIMUM_TIME = 5000;
 
       this.updateTestStatus(RUNNING, test);
-
-      setTimeout(
-        () =>
-          this.testCase((status) => {
-            this.updateTestStatus(status, test);
-          }),
-        this.randomInt(MINIMUM_TIME, MAXIMUM_TIME)
-      );
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          const result = [PASSED, FAILED][this.randomInt(0, 1)];
+          this.updateTestStatus(result, test);
+          resolve(result);
+        }, this.randomInt(MINIMUM_TIME, MAXIMUM_TIME));
+      });
     },
     randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
