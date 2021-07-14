@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <TestReportList :tests="sortedTests" />
-    <button class="btn btn-default" @click="concurrentTestRunner">
+    <TestReportList :tests="tests" />
+    <button class="btn btn-primary" @click="concurrentTestRunner">
       Run All
     </button>
   </div>
@@ -33,11 +33,6 @@ export default {
       { status: IDLE, id: 4, name: "Test One More Thing" },
     ],
   }),
-  computed: {
-    sortedTests() {
-      return this.tests;
-    },
-  },
   methods: {
     async concurrentTestRunner() {
       await Promise.all(this.tests.map((test) => this.runTest(test)));
@@ -54,9 +49,10 @@ export default {
       const MAXIMUM_TIME = 5000;
 
       this.updateTestStatus(RUNNING, test);
+      const result = [PASSED, FAILED][this.randomInt(0, 1)];
+
       return new Promise((resolve) => {
         setTimeout(() => {
-          const result = [PASSED, FAILED][this.randomInt(0, 1)];
           this.updateTestStatus(result, test);
           resolve(result);
         }, this.randomInt(MINIMUM_TIME, MAXIMUM_TIME));
