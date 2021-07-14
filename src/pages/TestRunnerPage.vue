@@ -1,9 +1,35 @@
 <template>
   <div class="container">
-    <TestReportList :tests="tests" />
-    <button class="btn btn-primary" @click="concurrentTestRunner">
-      Run All
-    </button>
+    <div class="row align-items-center justify-content-center">
+      <div class="col col-4">
+        <div class="d-flex justify-content-between">
+          <h3>Tests</h3>
+          <button
+            class="btn btn-sm btn-primary rounded-pill px-3"
+            @click="concurrentTestRunner"
+          >
+            Run All
+          </button>
+        </div>
+        <ul class="list-inline">
+          <li class="list-inline-item">
+            <strong>Total</strong>: {{ tests.length }}
+          </li>
+          <li class="list-inline-item">
+            <strong>Running:</strong> {{ totalRunning }}
+          </li>
+          <li class="list-inline-item">
+            <strong> Passed: </strong> {{ totalPassed }}
+          </li>
+          <li class="list-inline-item">
+            <strong> Fail: </strong> {{ totalFail }}
+          </li>
+        </ul>
+        <div class="row">
+          <TestReportList class="mx-auto mt-4" :tests="tests" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -14,13 +40,6 @@ const IDLE = 0;
 const RUNNING = 1;
 const PASSED = 2;
 const FAILED = 3;
-
-const testStatus = {
-  IDLE: 0,
-  RUNNING: 1,
-  PASSED: 2,
-  FAILED: 3,
-};
 
 export default {
   name: "TestRunnerPage",
@@ -33,6 +52,17 @@ export default {
       { status: IDLE, id: 4, name: "Test One More Thing" },
     ],
   }),
+  computed: {
+    totalRunning() {
+      return this.statusTotals(RUNNING);
+    },
+    totalPassed() {
+      return this.statusTotals(PASSED);
+    },
+    totalFail() {
+      return this.statusTotals(FAILED);
+    },
+  },
   methods: {
     async concurrentTestRunner() {
       await Promise.all(this.tests.map((test) => this.runTest(test)));
@@ -40,7 +70,6 @@ export default {
     updateTestStatus(status, test) {
       test.status = status;
       const testIndex = this.tests.findIndex((t) => test.id === t.id);
-      console.debug(test.id, Object.keys(testStatus)[test.status]);
       this.tests.splice(testIndex, 1, test);
       return test;
     },
@@ -60,6 +89,9 @@ export default {
     },
     randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1) + min);
+    },
+    statusTotals(status) {
+      return this.tests.filter((test) => status === test.status).length;
     },
   },
 };

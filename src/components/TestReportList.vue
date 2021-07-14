@@ -1,5 +1,5 @@
 <template>
-  <div class="card" style="width: 18rem">
+  <div class="card p-0" style="width: 18rem">
     <ul class="list-group list-group-flush">
       <li
         :class="['list-group-item', statusClass(test.status)]"
